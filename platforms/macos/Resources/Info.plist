@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>zh_CN</string>
+    <key>CFBundleDisplayName</key>
+    <string>Bren</string>
+    <key>CFBundleExecutable</key>
+    <string>Bren</string>
+    <key>CFBundleIdentifier</key>
+    <string>dev.bren.app</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Bren</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>26.0</string>
+    <key>LSMultipleInstancesProhibited</key>
+    <true/>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>Bren 只在本机采样翻译面板下方的颜色，用于在黑色和白色文字之间选择；不会保存或上传屏幕内容。</string>
+    <key>SUFeedURL</key>
+    <string>https://github.com/WilletJiang/Bren/releases/latest/download/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>f9VS2mZ+3FKpuDGCOLlPSgcrWBAU972iagUEymz6heA=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUAutomaticallyUpdate</key>
+    <true/>
+    <key>SUVerifyUpdateBeforeExtraction</key>
+    <true/>
+</dict>
+</plist>
