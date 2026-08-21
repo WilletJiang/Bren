@@ -5,7 +5,7 @@ using Bren.Windows.Application;
 
 namespace Bren.Windows;
 
-public partial class App : Application
+public partial class App : Microsoft.UI.Xaml.Application
 {
     private AppCoordinator? coordinator;
 
@@ -19,7 +19,7 @@ public partial class App : Application
             instance.RedirectActivationToAsync(AppInstance.GetCurrent().GetActivatedEventArgs()).AsTask().GetAwaiter().GetResult();
             return;
         }
-        Application.Start(_ => new App());
+        Microsoft.UI.Xaml.Application.Start(_ => new App());
     }
 
     public App() => InitializeComponent();

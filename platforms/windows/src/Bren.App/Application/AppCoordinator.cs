@@ -120,7 +120,7 @@ internal sealed class AppCoordinator : IAsyncDisposable
     }
 
     private void ShowFailure(string message) { session.Failed(); ClearWatchdogs(); overlay.Begin(); overlay.Fail(message); }
-    private void CopyVisibleText() { if (!string.IsNullOrEmpty(visibleText)) System.Windows.Forms.Clipboard.SetText(visibleText); }
+    private void CopyVisibleText() { if (!string.IsNullOrEmpty(visibleText)) ClipboardInterop.WriteUnicodeText(visibleText); }
     private static void Stop(ref CancellationTokenSource? source) { source?.Cancel(); source?.Dispose(); source = null; }
     private void ClearWatchdogs() { Stop(ref acceptanceWatchdog); Stop(ref firstTokenWatchdog); }
 

@@ -35,5 +35,5 @@ internal static class Protocol
         !string.IsNullOrWhiteSpace(text) && text.EnumerateRunes().Count() <= MaxCodePoints;
 
     internal static string? Text(CoreEvent item) =>
-        item.Data is { } data && data.Value.TryGetProperty("text", out var text) ? text.GetString() : null;
+        item.Data is { } data && data.TryGetProperty("text", out var text) ? text.GetString() : null;
 }

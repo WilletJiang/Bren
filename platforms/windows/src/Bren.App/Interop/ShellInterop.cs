@@ -26,7 +26,7 @@ internal static partial class ShellInterop
     internal const uint TpmReturnCmd = 0x0100;
     internal const uint TpmNonotify = 0x0080;
 
-    [LibraryImport("shell32.dll", EntryPoint = "Shell_NotifyIconW")] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool ShellNotifyIcon(uint message, ref NotifyIconData data);
+    [DllImport("shell32.dll", EntryPoint = "Shell_NotifyIconW", CharSet = CharSet.Unicode)] [return: MarshalAs(UnmanagedType.Bool)] internal static extern bool ShellNotifyIcon(uint message, ref NotifyIconData data);
     [LibraryImport("user32.dll")] internal static partial nint LoadIcon(nint instance, nint iconName);
     [LibraryImport("user32.dll")] internal static partial nint CreatePopupMenu();
     [LibraryImport("user32.dll", EntryPoint = "AppendMenuW", StringMarshalling = StringMarshalling.Utf16)] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool AppendMenu(nint menu, uint flags, nuint identifier, string text);

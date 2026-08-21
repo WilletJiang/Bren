@@ -12,7 +12,7 @@ internal static partial class ForegroundInterop
 
     [LibraryImport("user32.dll")] internal static partial nint GetForegroundWindow();
     [LibraryImport("user32.dll")] internal static partial uint GetWindowThreadProcessId(nint window, out uint processId);
-    [LibraryImport("kernel32.dll", SetLastError = true)] private static partial nint OpenProcess(uint access, bool inheritHandle, uint processId);
+    [LibraryImport("kernel32.dll", SetLastError = true)] private static partial nint OpenProcess(uint access, [MarshalAs(UnmanagedType.Bool)] bool inheritHandle, uint processId);
     [LibraryImport("advapi32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool OpenProcessToken(nint process, uint access, out nint token);
     [LibraryImport("advapi32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool GetTokenInformation(nint token, int informationClass, out TokenElevation tokenInformation, int tokenInformationLength, out int returnLength);
     [LibraryImport("kernel32.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static partial bool CloseHandle(nint handle);

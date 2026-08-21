@@ -3,11 +3,11 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.SystemBackdrops;
 using WinRT.Interop;
 using System.Runtime.InteropServices;
 using Bren.Windows.Application;
 using Windows.Graphics;
+using Windows.UI;
 using Bren.Windows.Interop;
 
 namespace Bren.Windows.Overlay;
@@ -103,7 +103,12 @@ internal sealed class OverlayController
         commands.Children.Add(Button("Close", (_, _) => Dismiss()));
     }
 
-    private static Button Button(string label, RoutedEventHandler click) => new() { Content = label, Padding = new Thickness(6, 2, 6, 2), FontSize = 12 }.Also(button => button.Click += click);
+    private static Button Button(string label, RoutedEventHandler click)
+    {
+        var button = new Button { Content = label, Padding = new Thickness(6, 2, 6, 2), FontSize = 12 };
+        button.Click += click;
+        return button;
+    }
 
     private void ConfigureNativeWindow()
     {

@@ -17,13 +17,13 @@ internal static partial class WindowInterop
     internal const int SwShownoactivate = 4;
     internal const uint MonitorDefaultToNearest = 2;
 
-    [LibraryImport("user32.dll")] internal static partial bool GetCursorPos(out PointInt point);
+    [LibraryImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool GetCursorPos(out PointInt point);
     [LibraryImport("user32.dll")] internal static partial nint MonitorFromPoint(PointInt point, uint flags);
-    [LibraryImport("user32.dll", SetLastError = true)] internal static partial bool GetMonitorInfo(nint monitor, ref MonitorInfo info);
+    [LibraryImport("user32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool GetMonitorInfo(nint monitor, ref MonitorInfo info);
     [LibraryImport("user32.dll")] internal static partial uint GetDpiForWindow(nint hwnd);
-    [LibraryImport("user32.dll")] internal static partial bool ShowWindow(nint hwnd, int command);
-    [LibraryImport("user32.dll")] internal static partial bool SetWindowPos(nint hwnd, nint insertAfter, int x, int y, int cx, int cy, uint flags);
+    [LibraryImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool ShowWindow(nint hwnd, int command);
+    [LibraryImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool SetWindowPos(nint hwnd, nint insertAfter, int x, int y, int cx, int cy, uint flags);
     [LibraryImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] internal static partial nint GetWindowLongPtr(nint hwnd, int index);
     [LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] internal static partial nint SetWindowLongPtr(nint hwnd, int index, nint value);
-    [LibraryImport("user32.dll")] internal static partial bool GetWindowRect(nint hwnd, out RectInt rect);
+    [LibraryImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] internal static partial bool GetWindowRect(nint hwnd, out RectInt rect);
 }
