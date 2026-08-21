@@ -15,12 +15,15 @@ final class AppCoordinator {
         overlay.onDismiss = { [weak self] in
             self?.cancelCurrentTranslation()
         }
+        overlay.onSubmitInput = { [weak self] text in
+            self?.beginInputTranslation(text)
+        }
         statusMenu = StatusMenuController(
             onTranslate: { [weak self] in
                 Task { @MainActor in await self?.translateSelection() }
             },
+            onInput: { [weak self] in self?.showInput() },
             onRequestAccessibility: { SelectionReader.requestAccess(prompt: true) },
-            onRequestScreenCapture: { BackdropLuminanceSampler.requestPermissionIfNeeded() },
             onCheckForUpdates: { [weak self] in self?.updates.checkForUpdates() },
             onQuit: { NSApplication.shared.terminate(nil) }
         )
@@ -51,7 +54,6 @@ final class AppCoordinator {
         }
 
         SelectionReader.requestAccess(prompt: true)
-        BackdropLuminanceSampler.requestPermissionIfNeeded()
 
         do {
             try core.start()
@@ -74,16 +76,32 @@ final class AppCoordinator {
         do {
             let selection = try await selectionReader.read()
             beginTranslation(selection)
+        } catch is SelectionReadError {
+            showInput()
         } catch {
             overlay.showError(error.localizedDescription)
         }
     }
 
+    private func showInput() {
+        cancelCurrentTranslation()
+        overlay.showInput()
+    }
+
     private func beginTranslation(_ selection: Selection) {
         cancelCurrentTranslation()
         overlay.begin()
+        startTranslation(selection.text)
+    }
+
+    private func beginInputTranslation(_ text: String) {
+        cancelCurrentTranslation()
+        startTranslation(text)
+    }
+
+    private func startTranslation(_ text: String) {
         do {
-            let requestID = try core.translate(selection.text) { [weak self] event in
+            let requestID = try core.translate(text) { [weak self] event in
                 guard let self, event.id == self.currentRequestID else { return }
                 switch event.event {
                 case "started":

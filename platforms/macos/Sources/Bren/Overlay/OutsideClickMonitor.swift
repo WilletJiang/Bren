@@ -2,6 +2,8 @@ import AppKit
 
 @MainActor
 final class OutsideClickMonitor {
+    nonisolated static let resizeMargin: CGFloat = 8
+
     nonisolated(unsafe) private var localMonitor: Any?
     nonisolated(unsafe) private var globalMonitor: Any?
     nonisolated(unsafe) private var activationObserver: NSObjectProtocol?
@@ -10,7 +12,10 @@ final class OutsideClickMonitor {
         localMonitor = NSEvent.addLocalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown]
         ) { [weak panel] event in
-            if panel?.isVisible == true, event.window !== panel {
+            if let panel,
+               panel.isVisible,
+               event.window !== panel,
+               Self.isOutside(location: NSEvent.mouseLocation, panelFrame: panel.frame) {
                 onOutsideClick()
             }
             return event
@@ -18,8 +23,13 @@ final class OutsideClickMonitor {
         globalMonitor = NSEvent.addGlobalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown]
         ) { [weak panel] _ in
-            guard panel?.isVisible == true else { return }
-            Task { @MainActor in onOutsideClick() }
+            Task { @MainActor in
+                guard let panel, panel.isVisible else { return }
+                guard Self.isOutside(location: NSEvent.mouseLocation, panelFrame: panel.frame) else {
+                    return
+                }
+                onOutsideClick()
+            }
         }
         activationObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification,
@@ -34,6 +44,10 @@ final class OutsideClickMonitor {
                 onOutsideClick()
             }
         }
+    }
+
+    nonisolated static func isOutside(location: CGPoint, panelFrame: CGRect) -> Bool {
+        !panelFrame.insetBy(dx: -resizeMargin, dy: -resizeMargin).contains(location)
     }
 
     deinit {

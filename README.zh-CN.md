@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-Bren 是一个原生桌面翻译工具。平台客户端读取当前文本选区，通过全局快捷键发起翻译，并在指针附近的紧凑非文档窗口中流式显示结果。当前已实现的客户端面向 macOS 26，使用 SwiftUI 与 AppKit。下一步是 Windows 原生客户端，必须同时发布 x64 与 ARM64 版本。
+Bren 是一个原生桌面翻译工具。平台客户端既可以读取当前文本选区，也可以接收直接输入的文本，并在指针附近的紧凑非文档窗口中流式显示结果。当前已实现的客户端面向 macOS 26，使用 SwiftUI 与 AppKit。下一步是 Windows 原生客户端，必须同时发布 x64 与 ARM64 版本。
 
 ## 架构
 
@@ -26,11 +26,11 @@ SwiftUI + AppKit       C# + WinUI 3        GTK4 + libadwaita
 
 ## macOS 实现
 
-macOS 客户端是 accessory application，没有普通 Dock 主窗口。Carbon 注册 `⌥D`。选区读取首先请求 `kAXSelectedTextAttribute`；若目标应用没有暴露选中文本，Bren 会发送真实复制命令，等待 pasteboard change count 确实增加，只读取新值，然后恢复原剪贴板。剪贴板未变化时会报错，旧内容永远不会被当成当前选区。
+macOS 客户端是 accessory application，没有普通 Dock 主窗口。Carbon 注册 `⌥D`。选区读取首先请求 `kAXSelectedTextAttribute`；若目标应用没有暴露选中文本，Bren 会发送真实复制命令，等待 pasteboard change count 确实增加，只读取新值，然后恢复原剪贴板。剪贴板未变化时绝不会使用旧内容，而是由同一个快捷键进入输入面板；回车翻译，`Shift+Enter` 换行。
 
-浮层使用 AppKit `NSPanel`，内部只有一个 clear `NSGlassEffectView` 和 SwiftUI 内容树。窗口显示时不夺取焦点，位于普通应用窗口之上，可以从非控件区域拖动；未固定时点击外部会消散。几何从 44pt 加载球过渡到宽 220–420pt 的结果面板。流式文本改变尺寸，但用户拖动后面板顶边保持稳定。
+浮层使用 AppKit `NSPanel`，内部只有一个 clear `NSGlassEffectView` 和 SwiftUI 内容树。窗口位于普通应用窗口之上，通过顶部中央的透明热区移动，通过右下角透明热区缩放；未固定时点击外部会消散。自动几何从 44pt 加载球过渡到宽 220–420pt 的结果面板，用户手动缩放后最大可到 720 × 560pt，并优先保持手动尺寸。
 
-文字颜色只允许纯黑或纯白。ScreenCaptureKit 把面板区域低分辨率采样为中位相对亮度，再以 WCAG 黑白对比度交点和双阈值滞回选择前景色，从而避免拖过临界背景时闪烁。像素只存在于内存中，立即归约成一个数值，不保存，也不发送给翻译后端。因此 macOS 会请求辅助功能和屏幕录制权限。
+原生玻璃之上覆盖单色黑色渐变，最浅处仍能在纯白桌面上为白字提供稳定对比度。这一确定性表面取代屏幕采样，因此 Bren 不再请求屏幕录制权限。输出保持为可选择的普通文本，只原生排版行内与块级 LaTeX 数学公式，刻意不解释 Markdown 格式。
 
 macOS 版本嵌入 Sparkle 2.9.6。GitHub Releases 保存应用归档和 appcast，更新归档使用 EdDSA 签名，应用默认每天检查一次更新。私钥只存在于本机 Keychain 和仓库的 Actions Secret。当前构建为个人使用的 ad-hoc 签名；若要向其他用户公开分发，还需要 Developer ID 签名和 notarization。
 
@@ -44,7 +44,7 @@ make build
 open dist/Bren.app
 ```
 
-`make test` 执行 Go 测试与 vet，获取经过 SHA-256 固定校验的 Sparkle 2.9.6 XCFramework，并执行 Swift 测试。`make build` 生成 `dist/Bren.app`，嵌入 `bren-core` 与 Sparkle，配置运行时搜索路径并验证 bundle。`make preview` 只渲染浮层，不调用模型。
+`make test` 执行 Go 测试与 vet，获取经过 SHA-256 固定校验的 Sparkle 2.9.6 XCFramework，解析版本锁定的 LaTeX 渲染器，并执行 Swift 测试。`make build` 生成 `dist/Bren.app`，嵌入 `bren-core`、Sparkle 与本地公式资源，配置运行时搜索路径并验证 bundle。`make preview` 只渲染浮层，不调用模型。
 
 安装包来自 [GitHub Releases](https://github.com/WilletJiang/Bren/releases/latest)。语义版本 tag 会触发 `.github/workflows/release.yml`，远端在 macOS 26 上执行测试、构建版本化归档、签名 Sparkle 更新并发布归档与 appcast。
 

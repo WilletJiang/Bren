@@ -8,16 +8,22 @@ let package = Package(
     products: [
         .executable(name: "Bren", targets: ["Bren"]),
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/colinc86/LaTeXSwiftUI.git",
+            exact: "2.0.0"
+        ),
+    ],
     targets: [
         .executableTarget(
             name: "Bren",
             dependencies: [
                 "Sparkle",
+                .product(name: "LaTeXSwiftUI", package: "LaTeXSwiftUI"),
             ],
             path: "Sources/Bren",
             linkerSettings: [
                 .linkedFramework("Carbon"),
-                .linkedFramework("ScreenCaptureKit"),
                 .unsafeFlags([
                     "-Xlinker", "-rpath",
                     "-Xlinker", "@executable_path/../Frameworks",

@@ -4,6 +4,10 @@ final class OverlayPanel: NSPanel {
     var onDismiss: (() -> Void)?
     var onCopy: (() -> Void)?
     var onTogglePin: (() -> Void)?
+    var onSubmitInput: ((String) -> Void)?
+    var onResize: ((CGSize) -> Void)?
+    var onResizeEnded: (() -> Void)?
+    var interceptsCopyShortcut = true
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
@@ -18,23 +22,12 @@ final class OverlayPanel: NSPanel {
             onDismiss?()
             return
         }
-        if modifiers.contains(.command), event.charactersIgnoringModifiers?.lowercased() == "c" {
+        if interceptsCopyShortcut,
+           modifiers.contains(.command),
+           event.charactersIgnoringModifiers?.lowercased() == "c" {
             onCopy?()
             return
         }
         super.keyDown(with: event)
-    }
-
-    override func sendEvent(_ event: NSEvent) {
-        if event.type == .leftMouseDown, !actionRegion.contains(event.locationInWindow) {
-            performDrag(with: event)
-            return
-        }
-        super.sendEvent(event)
-    }
-
-    private var actionRegion: CGRect {
-        guard frame.width > 84 else { return .null }
-        return CGRect(x: max(0, frame.width - 84), y: max(0, frame.height - 42), width: 84, height: 42)
     }
 }

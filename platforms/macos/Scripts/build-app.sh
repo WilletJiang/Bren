@@ -10,7 +10,7 @@ contents_dir="$app_dir/Contents"
 sparkle_framework="$platform_dir/.build/vendor/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 
 "$platform_dir/Scripts/fetch-sparkle.sh"
-mkdir -p "$contents_dir/MacOS" "$contents_dir/Helpers" "$contents_dir/Frameworks"
+mkdir -p "$contents_dir/MacOS" "$contents_dir/Helpers" "$contents_dir/Frameworks" "$contents_dir/Resources"
 
 (
     cd "$core_dir"
@@ -21,6 +21,12 @@ swift build --package-path "$platform_dir" -c release
 install -m 755 "$platform_dir/.build/release/Bren" "$contents_dir/MacOS/Bren"
 install -m 755 "$platform_dir/.build/bren-core" "$contents_dir/Helpers/bren-core"
 install -m 644 "$platform_dir/Resources/Info.plist" "$contents_dir/Info.plist"
+for bundle in "$contents_dir/Resources"/*.bundle(N); do
+    rm -rf "$bundle"
+done
+for bundle in "$platform_dir/.build/release"/*.bundle(N); do
+    ditto "$bundle" "$contents_dir/Resources/${bundle:t}"
+done
 rm -rf "$contents_dir/Frameworks/Sparkle.framework"
 ditto "$sparkle_framework" "$contents_dir/Frameworks/Sparkle.framework"
 

@@ -2,7 +2,7 @@
 
 [简体中文](README.zh-CN.md)
 
-Bren is a native desktop translation utility. The platform application reads the current text selection, starts a translation with a global shortcut, and presents streamed output in a compact non-document window near the pointer. The implemented client targets macOS 26 with SwiftUI and AppKit. Windows is the next native client and must ship for both x64 and ARM64.
+Bren is a native desktop translation utility. The platform application reads the current text selection, or accepts text entered directly, and presents streamed output in a compact non-document window near the pointer. The implemented client targets macOS 26 with SwiftUI and AppKit. Windows is the next native client and must ship for both x64 and ARM64.
 
 ## Architecture
 
@@ -26,11 +26,11 @@ The default backend is `gpt-5.6-luna` with low reasoning effort and the priority
 
 ## macOS implementation
 
-The macOS client is an accessory application without a normal Dock window. Carbon registers `⌥D`. Selection capture first reads `kAXSelectedTextAttribute`; if the focused application does not expose selected text, Bren posts a real copy command, waits for the pasteboard change count to advance, reads only the new value, and restores the original pasteboard. An unchanged pasteboard is an error and is never treated as selected text.
+The macOS client is an accessory application without a normal Dock window. Carbon registers `⌥D`. Selection capture first reads `kAXSelectedTextAttribute`; if the focused application does not expose selected text, Bren posts a real copy command, waits for the pasteboard change count to advance, reads only the new value, and restores the original pasteboard. An unchanged pasteboard is never treated as selected text; instead, the same shortcut opens a focused input panel where Return translates and Shift-Return inserts a line break.
 
-The overlay is an AppKit `NSPanel` containing one clear `NSGlassEffectView` and a SwiftUI content tree. It opens without taking focus, remains above normal application windows, can be dragged from non-control regions, disappears after an outside click unless pinned, and grows from a 44-point loading orb into a 220–420 point result module. Streamed text changes the panel geometry without moving its top edge after a user drag.
+The overlay is an AppKit `NSPanel` containing one clear `NSGlassEffectView` and a SwiftUI content tree. It remains above normal application windows, moves from an invisible top-center hot region, resizes from an invisible bottom-right hot corner, disappears after an outside click unless pinned, and grows from a 44-point loading orb into a 220–420 point automatic result module. A manual resize can expand it to 720 × 560 points and takes precedence over subsequent streamed geometry changes.
 
-Foreground text is explicitly black or white. ScreenCaptureKit reduces a low-resolution capture of the panel region to median relative luminance, then uses the WCAG black/white contrast crossover with hysteresis so movement over a borderline background does not flicker. Captured pixels remain in memory, are reduced to one number, and are never persisted or sent to the translation backend. macOS therefore requests Accessibility and Screen Recording access.
+The native glass remains visible beneath a monochrome black gradient whose lightest stop still provides a stable white-text contrast over a white desktop. This deterministic surface replaces screen sampling and removes the Screen Recording permission. Output is plain selectable text with native rendering for inline and display LaTeX delimiters; Markdown formatting is intentionally not interpreted.
 
 The macOS release embeds Sparkle 2.9.6. GitHub Releases hosts the app archive and appcast, update archives carry EdDSA signatures, and the app checks automatically once per day. The private key exists only in the local Keychain and the repository Actions secret. The current build is ad-hoc code signed for personal use; public distribution to unrelated machines would additionally require Developer ID signing and notarization.
 
@@ -44,7 +44,7 @@ make build
 open dist/Bren.app
 ```
 
-`make test` runs Go tests and vet, fetches the checksum-pinned Sparkle 2.9.6 XCFramework, and runs the Swift test suites. `make build` produces `dist/Bren.app`, embeds `bren-core` and Sparkle, sets the required runtime paths, and verifies the bundle structure. `make preview` renders the overlay without invoking a model.
+`make test` runs Go tests and vet, fetches the checksum-pinned Sparkle 2.9.6 XCFramework, resolves the version-locked LaTeX renderer, and runs the Swift test suites. `make build` produces `dist/Bren.app`, embeds `bren-core`, Sparkle, and the local formula resources, sets the required runtime paths, and verifies the bundle structure. `make preview` renders the overlay without invoking a model.
 
 The installed release is available from [GitHub Releases](https://github.com/WilletJiang/Bren/releases/latest). Development releases are created from semantic version tags by `.github/workflows/release.yml`; the workflow tests on macOS 26, builds a versioned archive, signs the Sparkle update, and publishes the archive with its appcast.
 
