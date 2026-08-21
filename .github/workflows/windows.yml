@@ -1,6 +1,7 @@
 name: Windows client
 
 on:
+  workflow_dispatch:
   pull_request:
     paths: ["platforms/windows/**", "core/**", ".github/workflows/windows.yml"]
   push:
