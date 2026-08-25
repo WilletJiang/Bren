@@ -30,8 +30,6 @@
     <true/>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
-    <key>NSScreenCaptureUsageDescription</key>
-    <string>Bren 只在本机采样翻译面板下方的颜色，用于在黑色和白色文字之间选择；不会保存或上传屏幕内容。</string>
     <key>SUFeedURL</key>
     <string>https://github.com/WilletJiang/Bren/releases/latest/download/appcast.xml</string>
     <key>SUPublicEDKey</key>
